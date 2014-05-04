@@ -1,0 +1,11 @@
+%ul
+  - if current_user
+    - if notice
+      %li= notice
+    %li
+      ようこそ #{current_user.name}さん
+    %li
+      アクセストークン： #{current_user.access_token}
+    %li= link_to "ログアウト", "/signout"
+  - else
+    %li= link_to "Facebookでログイン", "/auth/facebook"

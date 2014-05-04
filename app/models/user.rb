@@ -12,12 +12,8 @@ class User < ActiveRecord::Base
     create! do |user|
       user.provider = auth["provider"]
       user.uid = auth["uid"]
-
-      if user.provider != "twitter"
-        user.name = auth["info"]["name"]
-      else
-        user.name = auth["info"]["nickname"]
-      end
+      user.name = auth['info']['name']
+      user.access_token = auth['credentials']['token']
     end
   end
 

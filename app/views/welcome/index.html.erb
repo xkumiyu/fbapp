@@ -4,6 +4,7 @@
       <li><%= notice %></li>
     <% end %>
     <li>ようこそ <%= current_user.name %>さん</li>
+    <li>アクセストークン： <%= current_user.access_token %></li>
     <li><%= link_to "ログアウト", "/signout" %></li>
   <% else %>
     <li><%= link_to "Facebookでログイン", "/auth/facebook" %></li>

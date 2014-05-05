@@ -17,9 +17,9 @@ ActiveRecord::Schema.define(version: 20140504063006) do
     t.string   "provider"
     t.string   "uid"
     t.string   "name"
-    t.string   "image_url"
     t.string   "email"
-    t.string   "access_token"
+    t.string   "image"
+    t.string   "token"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

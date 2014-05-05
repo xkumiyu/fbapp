@@ -49,3 +49,5 @@ gem "twitter-bootstrap-rails"
 
 gem 'haml-rails'
 gem 'erb2haml'
+
+gem 'rails_config'

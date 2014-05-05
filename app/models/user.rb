@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
 
+  has_many :likes
+
   # attr_accessible :provider, :uid, :name
 
   # validates :provider, presence: :true

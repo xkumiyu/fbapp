@@ -1,4 +1,9 @@
 %ul
-  / - @likes.each do |like|
-  /   %li= like['id']
-  /   %li= like['name']
+  - @co_likes.each do |like|
+    - next if like[:count] < 1
+    %li= like[:friend][:id]
+    %li= like[:friend][:name]
+    %li= image_tag(like[:friend][:image])
+    %li= like[:count]
+    %li= like[:like_name]
+    %li ---

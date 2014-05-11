@@ -3,6 +3,37 @@ class UsersController < ApplicationController
   # def create
   # end
 
+  def age
+    graph = Koala::Facebook::API.new(current_user.token)
+
+
+    today = Date.today
+
+    age_count = Hash.new(0)
+    graph.get_connections("me", "friends?fields=id,name,birthday").each do |friend|
+      next if friend['birthday'].nil?
+      next if friend['birthday'] !~ /(\d{2})\/(\d{2})\/(\d{4})/
+
+      birthday = Date.new($3.to_i, $1.to_i, $2.to_i)
+      age = 0
+      if today - Date.new(today.year, birthday.month, birthday.day) > 0
+        age = today.year - birthday.year
+      else
+        age = today.year - birthday.year - 1
+      end
+
+      age_floor = (age / 10.0).floor * 10
+      age_count[age_floor] += 1
+    end
+
+    sum = age_count.values.inject(:+)
+    @age_rate = Hash.new
+    age_count.each do |k, v|
+      @age_rate[k] = v / sum.to_f * 100
+    end
+
+  end
+
   def calc
     graph = Koala::Facebook::API.new(current_user.token)
 

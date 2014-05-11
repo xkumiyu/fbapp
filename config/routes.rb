@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   root 'welcome#index'
 
   match 'calc', to: 'users#calc', via: [:get, :post]
+  match 'age', to: 'users#age', via: [:get, :post]
 
   match 'auth/:provider/callback', to: 'sessions#create', via: [:get, :post]
   match 'auth/failure', to: redirect('/'), via: [:get, :post]

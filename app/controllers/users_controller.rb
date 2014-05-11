@@ -3,6 +3,27 @@ class UsersController < ApplicationController
   # def create
   # end
 
+  def index
+  end
+
+  def list
+    data = [
+      {
+        "letter" => "A",
+        "frequency" => ".08167"
+      },
+      {
+        "letter" => "B",
+        "frequency" => ".01492"
+      },
+      {
+        "letter" => "Z",
+        "frequency" => ".00074"
+      }
+    ]
+    render :json => data
+  end
+
   def age
     graph = Koala::Facebook::API.new(current_user.token)
 
@@ -26,12 +47,21 @@ class UsersController < ApplicationController
       age_count[age_floor] += 1
     end
 
-    sum = age_count.values.inject(:+)
-    @age_rate = Hash.new
+    # sum = age_count.values.inject(:+)
+    # @age_rate = Hash.new
+    # age_count.each do |k, v|
+    #   @age_rate[k] = v / sum.to_f * 100
+    # end
+
+    data = Array.new
     age_count.each do |k, v|
-      @age_rate[k] = v / sum.to_f * 100
+      data.push({
+        'age' => k,
+        'population' => v
+      })
     end
 
+    render :json => data
   end
 
   def calc

@@ -44,8 +44,12 @@ class UsersController < ApplicationController
         my_likes[like['id']] = like['name']
     end
 
+    @male_count ||= 0
+    @female_count ||= 0
+    @unknown_count ||= 0
+
     friends = Array.new
-    graph.get_connections("me", "friends?fields=id,name,picture,likes").each do |friend|
+    graph.get_connections("me", "friends?fields=id,name,picture,likes,gender").each do |friend|
       if !friend['likes'].nil?
         friends.push({
           :user => {
@@ -56,6 +60,9 @@ class UsersController < ApplicationController
           :like_ids => friend['likes']['data'].map { |row| row['id'] }
         })
       end
+      @male_count += 1 if friend['gender'] == "male"
+      @female_count += 1 if friend['gender'] == "female"
+      @unknown_count +=1 if (friend['gender'] != "male" && friend['gender'] != "female")
     end
 
     @co_likes = Array.new

@@ -9,6 +9,8 @@
       ようこそ #{current_user.name}さん
     %li= link_to '同じサイトに「いいね！」している人を探す！',  '/colike'
     %li= link_to '友達の年齢の割合を可視化',  '/age'
+    %li= link_to '友達の性別の割合を可視化',  '/gender'
+    %li= link_to '友達の好きな名言',  '/quotes'
     %li= link_to "ログアウト", "/signout"
   - else
     %li= link_to "Facebookでログイン", "/auth/facebook"

@@ -7,7 +7,9 @@ Rails.application.routes.draw do
   get 'users/age'
 
   match 'colike', to: 'users#colike', via: [:get, :post]
-  # match 'age', to: 'users#age', via: [:get, :post]
+  match 'age', to: 'users#index', via: [:get, :post]
+  match 'gender', to: 'users#gender', via: [:get, :post]
+  match 'quotes', to: 'users#quotes', via: [:get, :post]
 
   match 'auth/:provider/callback', to: 'sessions#create', via: [:get, :post]
   match 'auth/failure', to: redirect('/'), via: [:get, :post]

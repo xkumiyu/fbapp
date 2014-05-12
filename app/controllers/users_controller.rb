@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :fb_data, only: [:age, :colike, :gendar]
+  before_action :fb_data, only: [:age, :colike, :gender, :quotes]
 
   # def create
   # end
@@ -50,15 +50,28 @@ class UsersController < ApplicationController
     end
   end
 
-  def gendar
+  def gender
     @male_count ||= 0
     @female_count ||= 0
     @unknown_count ||= 0
 
     @fb_data[:friends].each do |friend|
-      @male_count += 1 if friend['gender'] == "male"
-      @female_count += 1 if friend['gender'] == "female"
-      @unknown_count +=1 if (friend['gender'] != "male" && friend['gender'] != "female")
+      @male_count += 1 if friend[:gender] == "male"
+      @female_count += 1 if friend[:gender] == "female"
+      @unknown_count +=1 if (friend[:gender] != "male" && friend[:gender] != "female")
+    end
+  end
+
+  def quotes
+    @words = Array.new
+    @fb_data[:friends].each do |friend|
+      next if friend[:quotes].nil?
+      @words.push({
+        :uid        => friend[:uid],
+        :name       => friend[:name],
+        :image      => friend[:image],
+        :quotes     => friend[:quotes]
+      })
     end
   end
 
@@ -79,13 +92,14 @@ class UsersController < ApplicationController
         :likes => data[:page].keys
       }
 
-      friends = graph.get_connections("me", "friends?fields=id,name,birthday,picture,likes,gender")
+      friends = graph.get_connections("me", "friends?fields=id,name,birthday,picture,likes,gender,quotes")
       data[:friends] = Array.new
       friends.each do |friend|
         f = {
           :uid    => friend['id'],
           :name   => friend['name'],
           :gender => friend['gender'],
+          :quotes => friend['quotes'],
           :image  => friend['picture']['data']['url']
         }
 

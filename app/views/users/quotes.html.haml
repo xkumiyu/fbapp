@@ -1,0 +1,7 @@
+%ul
+  - @words.each do |friend|
+    %li= friend[:uid]
+    %li= friend[:name]
+    %li= image_tag(friend[:image])
+    %li= friend[:quotes]
+    %li ---

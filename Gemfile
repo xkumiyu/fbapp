@@ -6,9 +6,7 @@ gem 'rails', '4.1.0'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use SCSS for stylesheets
-# gem 'sass-rails', '~> 4.0.3'
-gem 'sass-rails'
-gem 'bootstrap-sass'
+gem 'sass-rails', '~> 4.0.3'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -47,10 +45,9 @@ gem 'execjs'
 gem 'omniauth-facebook'
 gem 'koala'
 
-# gem "less-rails"
-# gem "twitter-bootstrap-rails"
+gem 'bootstrap-sass'
 
 gem 'haml-rails'
-gem 'erb2haml'
+# gem 'erb2haml'
 
 gem 'rails_config'

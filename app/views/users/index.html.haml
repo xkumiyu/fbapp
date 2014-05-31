@@ -1,2 +1,13 @@
 
-= javascript_include_tag 'age'
+%ul
+  - if current_user
+    - if notice
+      %li= notice
+    %li
+      ようこそ #{current_user.name}さん
+    %li= link_to "ログアウト", "/signout"
+  - else
+    %li= link_to "Facebookでログイン", "/auth/facebook"
+
+
+-# = javascript_include_tag 'age'

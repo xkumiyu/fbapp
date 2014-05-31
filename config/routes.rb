@@ -3,7 +3,6 @@ Rails.application.routes.draw do
   root 'welcome#index'
 
   match 'users', to: 'users#index', via: [:get, :post]
-  get 'users/list'
   get 'users/age'
 
   match 'colike', to: 'users#colike', via: [:get, :post]

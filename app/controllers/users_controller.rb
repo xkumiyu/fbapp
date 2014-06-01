@@ -1,83 +1,76 @@
 class UsersController < ApplicationController
 
-  before_action :fb_data, only: [:age, :colike, :gender, :quotes]
-
-  # def create
-  # end
+  before_action :login, only: [:top, :gender]
 
   def index
   end
 
-  def age
-    age_count = Hash.new(0)
-    @fb_data[:friends].each do |friend|
-      next if friend[:birthday].nil?
+  def top
 
-      birthday = Date.new(
-        friend[:birthday][:year],
-        friend[:birthday][:month],
-        friend[:birthday][:day]
-      )
+    # render :json => fbdata['friends']
 
-      today = Date.today
-      diff = today - Date.new(today.year, birthday.month, birthday.day)
-      age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
-
-      age_floor = (age / 10.0).floor * 10
-      age_count[age_floor] += 1
-    end
-
-    data = Array.new
-    age_count.each do |k, v|
-      data.push({'age' => k, 'population' => v})
-    end
-
-    render :json => data
+    render :json => quotes( fbdata['friends'] )
+  # render :json => gender( fbdata['friends'] )
+    # render :json => colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
   end
 
-  def colike
-    @co_likes = Array.new
-    @fb_data[:friends].each do |friend|
-      next if friend[:likes].nil?
-      co_like_ids = @fb_data[:me][:likes] & friend[:likes]
-      @co_likes.push({
-        :uid        => friend[:uid],
-        :name       => friend[:name],
-        :image      => friend[:image],
-        :count      => co_like_ids.size,
-        :like_name  => co_like_ids.map { |co_like_id| @fb_data[:page][co_like_id] }
-      })
-    end
-  end
 
   def gender
-    @male_count ||= 0
-    @female_count ||= 0
-    @unknown_count ||= 0
-
-    @fb_data[:friends].each do |friend|
-      @male_count += 1 if friend[:gender] == "male"
-      @female_count += 1 if friend[:gender] == "female"
-      @unknown_count +=1 if (friend[:gender] != "male" && friend[:gender] != "female")
+    count = Hash.new(0)
+    fbdata['friends'].each do |friend|
+      case friend['gender']
+      when 'male'
+        count[:male] += 1
+      when 'female'
+        count[:female] += 1
+      else
+        count[:unknown] += 1
+      end
     end
+
+    render :json => count
   end
 
-  def quotes
-    @words = Array.new
-    @fb_data[:friends].each do |friend|
-      next if friend[:quotes].nil?
-      @words.push({
-        :uid        => friend[:uid],
-        :name       => friend[:name],
-        :image      => friend[:image],
-        :quotes     => friend[:quotes]
-      })
-    end
-  end
 
   private
-    def fb_data
-      @fb_data ||= get_fb_data
+    def login
+      redirect_to '/auth/facebook' if !current_user
+    end
+
+    def fbdata
+      save_fb_data if current_user.data.nil?
+      @fbdata ||= JSON.parse current_user.data
+    end
+
+    def colike( mylikes, friends, page )
+      data = Hash.new
+      friends.each do |friend|
+        next if friend['likes'].nil?
+
+        colike_ids = mylikes & friend['likes']
+        next if colike_ids.size == 0
+
+        data[friend['uid']] = {
+          :count  => colike_ids.size,
+          :page   => colike_ids.map{ |id| page[id] }
+        }
+      end
+
+      return data
+    end
+
+    def quotes( friends )
+      words = Hash.new
+      friends.each do |friend|
+        next if friend['quotes'].nil?
+        words[friend['uid']] = friend['quotes']
+      end
+      return words
+    end
+
+    def save_fb_data
+      current_user.data = JSON.generate get_fb_data
+      current_user.save
     end
 
     def get_fb_data
@@ -118,5 +111,31 @@ class UsersController < ApplicationController
 
       return data
     end
-
 end
+
+  # def age
+  #   age_count = Hash.new(0)
+  #   @fb_data[:friends].each do |friend|
+  #     next if friend[:birthday].nil?
+  #
+  #     birthday = Date.new(
+  #       friend[:birthday][:year],
+  #       friend[:birthday][:month],
+  #       friend[:birthday][:day]
+  #     )
+  #
+  #     today = Date.today
+  #     diff = today - Date.new(today.year, birthday.month, birthday.day)
+  #     age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
+  #
+  #     age_floor = (age / 10.0).floor * 10
+  #     age_count[age_floor] += 1
+  #   end
+  #
+  #   data = Array.new
+  #   age_count.each do |k, v|
+  #     data.push({'age' => k, 'population' => v})
+  #   end
+  #
+  #   render :json => data
+  # end

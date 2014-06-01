@@ -1,13 +1,5 @@
 
+%h3 users/index
+
 %ul
-  - if current_user
-    - if notice
-      %li= notice
-    %li
-      ようこそ #{current_user.name}さん
-    %li= link_to "ログアウト", "/signout"
-  - else
-    %li= link_to "Facebookでログイン", "/auth/facebook"
-
-
--# = javascript_include_tag 'age'
+  %li= link_to 'top', '/users'

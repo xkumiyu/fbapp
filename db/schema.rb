@@ -11,31 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140505064912) do
-
-  create_table "fbpages", force: true do |t|
-    t.string   "pid"
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "likes", force: true do |t|
-    t.string   "user_id"
-    t.string   "fbpage_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20140601045945) do
 
   create_table "users", force: true do |t|
     t.string   "provider"
     t.string   "uid"
     t.string   "name"
-    t.string   "email"
-    t.string   "image"
     t.string   "token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "data"
   end
 
 end

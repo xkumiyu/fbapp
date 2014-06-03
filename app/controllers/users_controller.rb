@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
 
-  before_action :login, only: [:top, :gender]
+  # before_action :login, only: [:top, :gender]
 
   def index
   end
@@ -9,7 +9,7 @@ class UsersController < ApplicationController
 
     # render :json => fbdata['friends']
 
-    render :json => quotes( fbdata['friends'] )
+    # render :json => quotes( fbdata['friends'] )
   # render :json => gender( fbdata['friends'] )
     # render :json => colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
   end
@@ -27,6 +27,10 @@ class UsersController < ApplicationController
         count[:unknown] += 1
       end
     end
+
+    count = [
+      {'a' => 1, 'population' => 10 }
+    ]
 
     render :json => count
   end

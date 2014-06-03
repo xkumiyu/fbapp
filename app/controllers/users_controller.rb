@@ -6,6 +6,8 @@ class UsersController < ApplicationController
   end
 
   def top
+    @colike_ids = colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
+    @quotes_ids = quotes( fbdata['friends'] )
   end
 
   def gender

@@ -1,3 +1,6 @@
+# $().ready () ->
+#   d3.select('svg').append('p')
+
 width = 960
 height = 500
 radius = Math.min(width, height) / 2
@@ -15,8 +18,7 @@ pie = d3.layout
   .sort(null)
   .value( (d) -> d.population )
 
-svg = d3.select("body")
-  .append("svg")
+svg = d3.select('svg#gender')
   .attr("width", width)
   .attr("height", height)
   .append("g")
@@ -33,11 +35,11 @@ d3.json("users/gender", (error, data) ->
 
   g.append("path")
     .attr("d", arc)
-    .style("fill", (d) -> color(d.data.age) )
+    .style("fill", (d) -> color(d.data.gender) )
 
   g.append("text")
     .attr("transform", (d) -> "translate(" + arc.centroid(d) + ")" )
     .attr("dy", ".35em")
     .style("text-anchor", "middle")
-    .text( (d) -> d.data.age )
+    .text( (d) -> d.data.gender )
 )

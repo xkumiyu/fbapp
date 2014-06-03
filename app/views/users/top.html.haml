@@ -1,8 +1,11 @@
 
-= javascript_include_tag 'users'
+%h3 users/top
 
--# %h3 users/top
--#
--# %ul
--#   %li= "ようこそ #{current_user.name}さん"
--#   %li= link_to "ログアウト", "/signout"
+%ul
+  %li= "ようこそ #{current_user.name}さん"
+  %li= link_to "ログアウト", "/signout"
+
+%svg#gender
+%svg#age
+
+= javascript_include_tag 'users/gender'

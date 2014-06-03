@@ -16,21 +16,22 @@ class UsersController < ApplicationController
 
 
   def gender
-    count = Hash.new(0)
+    count = [
+      { 'gender' => 'male', 'population' => 0 },
+      { 'gender' => 'female', 'population' => 0 },
+      { 'gender' => 'unknown', 'population' => 0 }
+    ]
+
     fbdata['friends'].each do |friend|
       case friend['gender']
       when 'male'
-        count[:male] += 1
+        count[0]['population'] += 1
       when 'female'
-        count[:female] += 1
+        count[1]['population'] += 1
       else
-        count[:unknown] += 1
+        count[2]['population'] += 1
       end
     end
-
-    count = [
-      {'a' => 1, 'population' => 10 }
-    ]
 
     render :json => count
   end

@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   get 'users' => 'users#top'
   get 'users/gender'
+  get 'users/age'
 
   match 'auth/:provider/callback', to: 'sessions#create', via: [:get, :post]
   match 'auth/failure', to: redirect('/'), via: [:get, :post]

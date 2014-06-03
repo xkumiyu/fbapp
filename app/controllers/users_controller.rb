@@ -1,19 +1,12 @@
 class UsersController < ApplicationController
 
-  # before_action :login, only: [:top, :gender]
+  before_action :login, only: [:top, :gender, :age]
 
   def index
   end
 
   def top
-
-    # render :json => fbdata['friends']
-
-    # render :json => quotes( fbdata['friends'] )
-  # render :json => gender( fbdata['friends'] )
-    # render :json => colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
   end
-
 
   def gender
     count = [
@@ -36,6 +29,32 @@ class UsersController < ApplicationController
     render :json => count
   end
 
+  def age
+    age_count = Hash.new(0)
+    fbdata['friends'].each do |friend|
+      next if friend['birthday'].nil?
+
+      birthday = Date.new(
+        friend['birthday']['year'],
+        friend['birthday']['month'],
+        friend['birthday']['day']
+      )
+
+      today = Date.today
+      diff = today - Date.new(today.year, birthday.month, birthday.day)
+      age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
+
+      age_floor = (age / 10.0).floor * 10
+      age_count[age_floor] += 1
+    end
+
+    data = Array.new
+    age_count.each do |k, v|
+      data.push({'age' => k, 'population' => v})
+    end
+
+    render :json => data
+  end
 
   private
     def login
@@ -117,30 +136,3 @@ class UsersController < ApplicationController
       return data
     end
 end
-
-  # def age
-  #   age_count = Hash.new(0)
-  #   @fb_data[:friends].each do |friend|
-  #     next if friend[:birthday].nil?
-  #
-  #     birthday = Date.new(
-  #       friend[:birthday][:year],
-  #       friend[:birthday][:month],
-  #       friend[:birthday][:day]
-  #     )
-  #
-  #     today = Date.today
-  #     diff = today - Date.new(today.year, birthday.month, birthday.day)
-  #     age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
-  #
-  #     age_floor = (age / 10.0).floor * 10
-  #     age_count[age_floor] += 1
-  #   end
-  #
-  #   data = Array.new
-  #   age_count.each do |k, v|
-  #     data.push({'age' => k, 'population' => v})
-  #   end
-  #
-  #   render :json => data
-  # end

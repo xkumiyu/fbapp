@@ -10,6 +10,11 @@ class UsersController < ApplicationController
     @quotes_ids = quotes( fbdata['friends'] )
   end
 
+  def update
+    save_fb_data
+    redirect_to '/users'
+  end
+
   def gender
     count = [
       { 'gender' => 'male', 'population' => 0 },

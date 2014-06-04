@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   root 'users#index'
 
   get 'users' => 'users#top'
+  get 'users/update'
+
   get 'users/gender'
   get 'users/age'
 

@@ -6,16 +6,27 @@
   %li= link_to "データ更新", "/users/update"
   %li= link_to "ログアウト", "/signout"
 
+%h4 gender
 %svg#gender
+
+%h4 age
 %svg#age
 
+%h4 quote
 %ul
-  - @quotes_ids.each do |k, v|
-    %li= "#{k}: #{v}"
+  - @quotes.each do |row|
+    %li
+      = link_to image_tag(row[:image]), row[:link], :target => '_blank'
+      = link_to row[:name], row[:link], :target => '_blank'
+      = row[:quote]
 
+%h4 colike
 %ul
-  - @colike_ids.each do |k, v|
-    %li= "#{k}: #{v[:page]}"
+  - @colike.each do |row|
+    %li
+      = link_to image_tag(row[:image]), row[:link], :target => '_blank'
+      = link_to row[:name], row[:link], :target => '_blank'
+      = "#{row[:page]}(#{row[:count]})"
 
 = javascript_include_tag 'users/gender'
 = javascript_include_tag 'users/age'

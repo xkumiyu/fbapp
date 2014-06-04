@@ -6,8 +6,9 @@ class UsersController < ApplicationController
   end
 
   def top
-    @colike_ids = colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
-    @quotes_ids = quotes( fbdata['friends'] )
+    # render :json => fbdata
+    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] ).values
+    @quotes = get_quotes( fbdata['friends'] ).values
   end
 
   def update
@@ -73,7 +74,7 @@ class UsersController < ApplicationController
       @fbdata ||= JSON.parse current_user.data
     end
 
-    def colike( mylikes, friends, page )
+    def get_colike( mylikes, friends, page )
       data = Hash.new
       friends.each do |friend|
         next if friend['likes'].nil?
@@ -82,6 +83,9 @@ class UsersController < ApplicationController
         next if colike_ids.size == 0
 
         data[friend['uid']] = {
+          :name   => friend['name'],
+          :link   => friend['link'],
+          :image  => friend['image'],
           :count  => colike_ids.size,
           :page   => colike_ids.map{ |id| page[id] }
         }
@@ -90,13 +94,18 @@ class UsersController < ApplicationController
       return data
     end
 
-    def quotes( friends )
-      words = Hash.new
+    def get_quotes( friends )
+      data = Hash.new
       friends.each do |friend|
         next if friend['quotes'].nil?
-        words[friend['uid']] = friend['quotes']
+        data[friend['uid']] = {
+          :name   => friend['name'],
+          :link   => friend['link'],
+          :image  => friend['image'],
+          :quote  => friend['quotes']
+        }
       end
-      return words
+      return data
     end
 
     def save_fb_data
@@ -116,12 +125,13 @@ class UsersController < ApplicationController
         :likes => data[:page].keys
       }
 
-      friends = graph.get_connections("me", "friends?fields=id,name,birthday,picture,likes,gender,quotes")
+      friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
       data[:friends] = Array.new
       friends.each do |friend|
         f = {
           :uid    => friend['id'],
           :name   => friend['name'],
+          :link   => friend['link'],
           :gender => friend['gender'],
           :quotes => friend['quotes'],
           :image  => friend['picture']['data']['url']

@@ -8,25 +8,25 @@
   %h3 ようこそ #{current_user.name}さん
 
   .row
-    .col-md-6
+    .col-md-6.col-sm-12.col-xs-12
       .panel.panel-default
         .panel-heading
           %h4
             %span.glyphicon.glyphicon-heart-empty
-            友人の男女比グラフ
+            友人の男女比
         .panel-body
           %svg#gender
 
-    .col-md-6
+    .col-md-6.col-sm-12.col-xs-12
       .panel.panel-default
         .panel-heading
           %h4
             %span.glyphicon.glyphicon-user
-            友人の年齢グラフ
+            友人の年齢
         .panel-body
           %svg#age
 
-    .col-md-6
+    .col-md-6.col-sm-12.col-xs-12
       .panel.panel-default
         .panel-heading
           %h4
@@ -49,7 +49,7 @@
           /       = link_to row[:name], row[:link], :target => '_blank'
           /       = row[:quote]
 
-    .col-md-6
+    .col-md-6.col-sm-12.col-xs-12
       .panel.panel-default
         .panel-heading
           %h4

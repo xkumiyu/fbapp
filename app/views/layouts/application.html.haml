@@ -19,4 +19,9 @@
         .navbar-header
           / = link_to 'FbApp', root_path
           %a.navbar-brand(href='/') FbApp
+
+        %ul.nav.navbar-nav.navbar-right
+          %li= link_to "データ更新", "/users/update"
+          %li= link_to "ログアウト", "/signout"
+
     = yield

@@ -6,8 +6,8 @@ class UsersController < ApplicationController
   end
 
   def top
-    # render :json => fbdata
-    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] ).values.sort{|a,b| b[:count] <=> a[:count]}
+    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
+      .values.sort{|a,b| b[:count] <=> a[:count]}
     @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
   end
 
@@ -18,9 +18,9 @@ class UsersController < ApplicationController
 
   def gender
     count = [
-      { 'gender' => 'male', 'population' => 0 },
-      { 'gender' => 'female', 'population' => 0 },
-      { 'gender' => 'unknown', 'population' => 0 }
+      { 'gender' => '男性', 'population' => 0 },
+      { 'gender' => '女性', 'population' => 0 },
+      { 'gender' => '性別不明', 'population' => 0 }
     ]
 
     fbdata['friends'].each do |friend|
@@ -58,7 +58,7 @@ class UsersController < ApplicationController
 
     data = Array.new
     age_count.each do |k, v|
-      data.push({'age' => k, 'population' => v})
+      data.push({'age' => "#{k}代", 'population' => v})
     end
 
     render :json => data

@@ -5,13 +5,12 @@ width = $("div.col-md-6").width()
 height = 400
 radius = Math.min(width, height) / 2
 
-color = d3.scale
-  .ordinal()
-  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
+color = d3.scale.category10()
 
 arc = d3.svg
   .arc()
-  .outerRadius(radius - 10).innerRadius(0)
+  .outerRadius(radius - 10)
+  .innerRadius(0)
 
 pie = d3.layout
   .pie()
@@ -22,7 +21,7 @@ svg = d3.select('svg#gender')
   .attr("width", width)
   .attr("height", height)
   .append("g")
-  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+  .attr("transform", "translate(#{width / 2},#{height / 2})")
 
 d3.json("users/gender", (error, data) ->
   data.forEach( (d) -> d.population = +d.population )
@@ -35,11 +34,21 @@ d3.json("users/gender", (error, data) ->
 
   g.append("path")
     .attr("d", arc)
+    .attr("stroke", "white")
     .style("fill", (d) -> color(d.data.gender) )
+    .transition()
+    .duration(1000)
+    .attrTween("d", (d) ->
+      interpolate = d3.interpolate(
+        { startAngle : 0, endAngle : 0 },
+        { startAngle : d.startAngle, endAngle : d.endAngle }
+      )
+      (t) -> arc interpolate(t)
+    )
 
   g.append("text")
     .attr("transform", (d) -> "translate(" + arc.centroid(d) + ")" )
     .attr("dy", ".35em")
     .style("text-anchor", "middle")
-    .text( (d) -> d.data.gender )
+    .text( (d) -> "#{d.data.gender}(#{d.data.population}人)" )
 )

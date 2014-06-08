@@ -13,7 +13,7 @@ class UsersController < ApplicationController
 
   def update
     save_fb_data
-    redirect_to '/users'
+    redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end
 
   def gender
@@ -117,13 +117,21 @@ class UsersController < ApplicationController
       data = Hash.new
       graph = Koala::Facebook::API.new(current_user.token)
 
+      me = graph.get_object('me?fields=birthday,picture')
+      data[:me] = {:image => me['picture']['data']['url']}
+      if !me['birthday'].nil? and me['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/
+        data[:me][:birthday] = {
+          :year   => $3.to_i,
+          :month  => $1.to_i,
+          :day    => $2.to_i
+        }
+      end
+
       data[:page] = Hash.new
       graph.get_connections("me", "likes?fields=name,id").each do |like|
         data[:page][like['id']] = like['name']
       end
-      data[:me] = {
-        :likes => data[:page].keys
-      }
+      data[:me][:likes] = data[:page].keys
 
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
       data[:friends] = Array.new

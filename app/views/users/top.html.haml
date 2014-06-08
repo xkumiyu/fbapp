@@ -1,8 +1,11 @@
 .container
 
+  - if notice
+    .alert.alert-info
+      = notice
+      %button.close(data-dismiss="alert") &times;
 
   %h3 ようこそ #{current_user.name}さん
-
 
   .row
     .col-md-6

@@ -1,40 +1,40 @@
-%div.container
+.container
 
 
   %h3 ようこそ #{current_user.name}さん
 
 
-  %div.row
-    %div.col-md-6
-      %div.panel.panel-default
-        %div.panel-heading
+  .row
+    .col-md-6
+      .panel.panel-default
+        .panel-heading
           %h4
             %span.glyphicon.glyphicon-heart-empty
             友人の男女比グラフ
-        %div.panel-body
+        .panel-body
           %svg#gender
 
-    %div.col-md-6
-      %div.panel.panel-default
-        %div.panel-heading
+    .col-md-6
+      .panel.panel-default
+        .panel-heading
           %h4
             %span.glyphicon.glyphicon-user
             友人の年齢グラフ
-        %div.panel-body
+        .panel-body
           %svg#age
 
-    %div.col-md-6
-      %div.panel.panel-default
-        %div.panel-heading
+    .col-md-6
+      .panel.panel-default
+        .panel-heading
           %h4
             %span.glyphicon.glyphicon-pencil
             友人の好きな言葉
-        %div.panel-body
+        .panel-body
           - @quotes.first(10).each do |row|
-            %div.media
+            .media
               %a.pull-left
                 = image_tag(row[:image], :class => "media-object", :alt => row[:name])
-              %div.media-body
+              .media-body
                 %h4.media-heading
                   = link_to row[:name], row[:link], :target => '_blank'
                 = row[:quote]
@@ -46,18 +46,18 @@
           /       = link_to row[:name], row[:link], :target => '_blank'
           /       = row[:quote]
 
-    %div.col-md-6
-      %div.panel.panel-default
-        %div.panel-heading
+    .col-md-6
+      .panel.panel-default
+        .panel-heading
           %h4
             %span.glyphicon.glyphicon-thumbs-up
             趣味が似ている友人？
-        %div.panel-body
+        .panel-body
           - @colike.first(10).each do |row|
-            %div.media
+            .media
               %a.pull-left
                 = image_tag(row[:image], :class => "media-object", :alt => row[:name])
-              %div.media-body
+              .media-body
                 %h4.media-heading
                   = link_to row[:name], row[:link], :target => '_blank'
                   %span.badge="#{row[:count]}"

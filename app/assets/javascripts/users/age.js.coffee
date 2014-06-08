@@ -1,4 +1,4 @@
-width = 960
+width = $("div.col-md-6").width()
 height = 500
 radius = Math.min(width, height) / 2
 

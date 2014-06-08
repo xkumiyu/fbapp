@@ -7,8 +7,8 @@ class UsersController < ApplicationController
 
   def top
     # render :json => fbdata
-    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] ).values
-    @quotes = get_quotes( fbdata['friends'] ).values
+    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] ).values.sort{|a,b| b[:count] <=> a[:count]}
+    @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
   end
 
   def update

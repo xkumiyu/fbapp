@@ -1,32 +1,36 @@
+%div.col-md-12
+  %h3 users/top
 
-%h3 users/top
+  %ul
+    %li= "ようこそ #{current_user.name}さん"
+    %li= link_to "データ更新", "/users/update"
+    %li= link_to "ログアウト", "/signout"
 
-%ul
-  %li= "ようこそ #{current_user.name}さん"
-  %li= link_to "データ更新", "/users/update"
-  %li= link_to "ログアウト", "/signout"
+  %div.col-md-6
+    %h4 gender
+    %svg#gender
 
-%h4 gender
-%svg#gender
+  %div.col-md-6
+    %h4 age
+    %svg#age
 
-%h4 age
-%svg#age
+  %div.col-md-6
+    %h4 quote
+    %ul
+      - @quotes.first(10).each do |row|
+        %li
+          = link_to image_tag(row[:image]), row[:link], :target => '_blank'
+          = link_to row[:name], row[:link], :target => '_blank'
+          = row[:quote]
 
-%h4 quote
-%ul
-  - @quotes.each do |row|
-    %li
-      = link_to image_tag(row[:image]), row[:link], :target => '_blank'
-      = link_to row[:name], row[:link], :target => '_blank'
-      = row[:quote]
-
-%h4 colike
-%ul
-  - @colike.each do |row|
-    %li
-      = link_to image_tag(row[:image]), row[:link], :target => '_blank'
-      = link_to row[:name], row[:link], :target => '_blank'
-      = "#{row[:page]}(#{row[:count]})"
+  %div.col-md-6
+    %h4 colike
+    %ul
+      - @colike.first(10).each do |row|
+        %li
+          = link_to image_tag(row[:image]), row[:link], :target => '_blank'
+          = link_to row[:name], row[:link], :target => '_blank'
+          = "#{row[:page]}(#{row[:count]})"
 
 = javascript_include_tag 'users/gender'
 = javascript_include_tag 'users/age'

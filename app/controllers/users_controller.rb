@@ -116,6 +116,7 @@ class UsersController < ApplicationController
     def get_fb_data
       data = Hash.new
       graph = Koala::Facebook::API.new(current_user.token)
+      Koala.config.api_version = "v1.0"
 
       me = graph.get_object('me?fields=birthday,picture')
       data[:me] = {:image => me['picture']['data']['url']}

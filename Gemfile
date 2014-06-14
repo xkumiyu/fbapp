@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.0'
+gem 'rails', '~> 4.1.0'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use SCSS for stylesheets
@@ -40,16 +40,32 @@ gem 'spring',        group: :development
 # gem 'debugger', group: [:development, :test]
 
 gem 'execjs'
-
-# gem 'devise'
 gem 'omniauth-facebook'
 gem 'koala'
-
 gem 'bootstrap-sass'
-
 gem 'haml-rails'
-# gem 'erb2haml'
-
 gem 'rails_config'
-
 gem 'spinjs-rails'
+
+group :test, :development do
+  gem 'pry-rails'
+  gem 'pry-doc'
+  gem 'pry-stack_explorer'
+  gem 'pry-byebug'
+
+  gem 'better_errors'
+  gem 'binding_of_caller'
+
+  gem 'hirb'
+  gem 'hirb-unicode'
+
+  gem 'tapp'
+  gem 'awesome_print'
+  gem 'quiet_assets'
+  gem 'annotate', git: 'git://github.com/ctran/annotate_models.git'
+  gem 'timecop'
+  gem 'rspec-rails'
+  gem 'guard-rspec'
+  gem 'factory_girl_rails'
+  gem 'database_rewinder'
+end

@@ -16,8 +16,9 @@
           %a.navbar-brand(href='/') FbApp
 
         %ul.nav.navbar-nav.navbar-right
-          %li= image_tag(@my_image, :class => "media-object", :alt => @my_image, :width => 30)
-          %li= link_to "#{current_user.name}"
+          - if current_user
+            %li= image_tag(@my_image, :class => "media-object", :alt => @my_image, :width => 30)
+            %li= link_to "#{current_user.name}"
           %li.spin= link_to "データ更新", "/users/update"
           %li= link_to "ログアウト", "/signout"
 

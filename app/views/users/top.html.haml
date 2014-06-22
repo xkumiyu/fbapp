@@ -64,7 +64,10 @@
                 %h4.media-heading
                   = link_to row[:name], row[:link], :target => '_blank'
                   %span.badge="#{row[:count]}"
-                = "#{row[:page]}"
+                - row[:page].each do |page|
+                  %span.label.label-default
+                    =page
+
 
           / %ul
           /   - @colike.first(10).each do |row|

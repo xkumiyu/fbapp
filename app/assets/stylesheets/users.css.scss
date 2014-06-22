@@ -1,3 +1,11 @@
 .label {
   margin-right: 5px;  //co_likeの表示時に、タグ名が重なる問題を解消する
 }
+
+.navbar-default {
+	li{
+		img{
+			margin: 10px 0;
+		}
+	}
+}

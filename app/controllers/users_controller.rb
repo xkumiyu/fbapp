@@ -9,6 +9,7 @@ class UsersController < ApplicationController
     @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
       .values.sort{|a,b| b[:count] <=> a[:count]}
     @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
+    @my_image = fbdata['me']['image']
   end
 
   def update

@@ -62,9 +62,9 @@
                 %h4.media-heading
                   = link_to row[:name], row[:link], :target => '_blank'
                   %span.badge="#{row[:count]}"
-                - row[:page].each do |page|
+                - row[:page].each do |id|
                   %span.label.label-default
-                    =page
+                    = link_to @pagename[id], "https://www.facebook.com/" + id, :target => '_blank'
 
 
           / %ul

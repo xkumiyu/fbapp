@@ -6,10 +6,11 @@ class UsersController < ApplicationController
   end
 
   def top
-    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'], fbdata['page'] )
+    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'])
       .values.sort{|a,b| b[:count] <=> a[:count]}
     @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
-    @my_image = fbdata['me']['image']
+    @myimage = fbdata['me']['image']
+    @pagename = fbdata['page']
   end
 
   def update
@@ -75,7 +76,7 @@ class UsersController < ApplicationController
       @fbdata ||= JSON.parse current_user.data
     end
 
-    def get_colike( mylikes, friends, page )
+    def get_colike( mylikes, friends)
       data = Hash.new
       friends.each do |friend|
         next if friend['likes'].nil?
@@ -88,7 +89,7 @@ class UsersController < ApplicationController
           :link   => friend['link'],
           :image  => friend['image'],
           :count  => colike_ids.size,
-          :page   => colike_ids.map{ |id| page[id] }
+          :page   => colike_ids.map{ |id| id}
         }
       end
 

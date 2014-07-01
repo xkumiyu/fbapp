@@ -13,13 +13,20 @@
       .container
         .navbar-header
           / = link_to 'FbApp', root_path
-          %a.navbar-brand(href='/') FbApp
+          %a.navbar-brand(href='/') HexHoop
 
-        %ul.nav.navbar-nav.navbar-right
-          - if current_user
-            %li= image_tag(@myimage, :class => "media-object", :alt => @myimage, :width => 30)
-            %li= link_to "#{current_user.name}"
-          %li.spin= link_to "データ更新", "/users/update"
-          %li= link_to "ログアウト", "/signout"
+          %button.navbar-toggle(data-toggle="collapse" data-target=".target")
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+
+        .collapse.navbar-collapse.target
+          %ul.nav.navbar-nav.navbar-right
+            - if current_user
+              %li= image_tag(@myimage, :class => "media-object", :alt => @myimage, :width => 30)
+              %li= link_to "#{current_user.name}"
+            %li.spin= link_to "このアプリについて", "/users/about"
+            %li.spin= link_to "データ更新", "/users/update"
+            %li= link_to "ログアウト", "/signout"
 
     = yield

@@ -14,3 +14,27 @@
  *= require_self
  */
 @import "bootstrap";
+
+body {
+	background-color: #DED2BF;
+
+	nav.navbar{
+		background-color: #6B655D;
+		border-color: #6B655D;
+		border-radius: 0px;
+		.navbar-brand{
+			color: #ffffff;
+			text-shadow: 1px -1px 0 rgba(0,0,0,1);
+			font-size: 28px;
+		}
+		.navbar-nav li a {
+			color: #ffffff;
+			text-shadow: 1px -1px 0 rgba(0,0,0,1);
+		}
+	}
+	.panel.panel-default{
+		.panel-heading h4{
+			text-shadow: -1px 1px 0 rgba(255,255,255,1);
+		}
+	}
+}

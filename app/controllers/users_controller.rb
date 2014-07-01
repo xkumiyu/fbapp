@@ -5,6 +5,9 @@ class UsersController < ApplicationController
   def index
   end
 
+  def about
+  end
+
   def top
     @colike = get_colike( fbdata['me']['likes'], fbdata['friends'])
       .values.sort{|a,b| b[:count] <=> a[:count]}

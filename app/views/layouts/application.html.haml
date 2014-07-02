@@ -4,7 +4,7 @@
     %meta{:charset => "utf-8"}/
     %meta{:content => "IE=Edge,chrome=1", "http-equiv" => "X-UA-Compatible"}/
     %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
-    %title= content_for?(:title) ? yield(:title) : "FbApp"
+    %title= Settings.title
     = stylesheet_link_tag "application", :media => "all"
     = javascript_include_tag "http://d3js.org/d3.v3.min.js"
     = javascript_include_tag "application"
@@ -12,8 +12,7 @@
     %nav.navbar.navbar-default{:role => 'navigation'}
       .container
         .navbar-header
-          / = link_to 'FbApp', root_path
-          %a.navbar-brand(href='/') HexHoop
+          = link_to Settings.title, root_path, :class => 'navbar-brand'
 
           %button.navbar-toggle(data-toggle="collapse" data-target=".target")
             %span.icon-bar
@@ -25,8 +24,11 @@
             - if current_user
               %li= image_tag(@myimage, :class => "media-object", :alt => @myimage, :width => 30)
               %li= link_to "#{current_user.name}"
-            %li.spin= link_to "このアプリについて", "/users/about"
-            %li.spin= link_to "データ更新", "/users/update"
-            %li= link_to "ログアウト", "/signout"
+            %li= link_to "このアプリについて", "/users/about"
+            %li.spin= link_to "データ更新", "/users/update" if current_user
+            - if current_user
+              %li= link_to "ログアウト", "/signout"
+            - else
+              %li= link_to "ログイン", "/users"
 
     = yield

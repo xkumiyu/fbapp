@@ -3,6 +3,9 @@ class UsersController < ApplicationController
   before_action :login, only: [:top, :gender, :age]
 
   def index
+    if current_user
+      redirect_to :action => 'top'
+    end
   end
 
   def about

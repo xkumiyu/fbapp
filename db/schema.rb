@@ -11,7 +11,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140601045945) do
+ActiveRecord::Schema.define(version: 20140705141731) do
+
+  create_table "fb_friends", force: true do |t|
+    t.integer  "fb_user_id"
+    t.integer  "fb_friend_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "fb_pages", force: true do |t|
+    t.integer  "fb_user_id"
+    t.integer  "pid"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "fb_users", force: true do |t|
+    t.integer  "user_id"
+    t.string   "uid"
+    t.string   "name"
+    t.string   "image_url"
+    t.date     "birthday"
+    t.string   "gendar"
+    t.string   "quotes"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "provider"
@@ -20,7 +47,6 @@ ActiveRecord::Schema.define(version: 20140601045945) do
     t.string   "token"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "data"
   end
 
 end

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'users' => 'users#top'
   get 'users/update'
   get 'users/about'
+  get 'test' => 'users#test'
 
   get 'users/gender'
   get 'users/age'

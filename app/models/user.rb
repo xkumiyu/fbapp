@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
 
+  has_one :fb_user
   # attr_accessible :provider, :uid, :name
 
   # validates :provider, presence: :true

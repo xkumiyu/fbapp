@@ -3,12 +3,17 @@ class UsersController < ApplicationController
   before_action :login, only: [:top, :gender, :age]
 
   def index
-    if current_user
-      redirect_to :action => 'top'
-    end
+    # if current_user
+    #   redirect_to :action => 'top'
+    # end
   end
 
   def about
+  end
+
+  def test
+    save_fb_data
+    render :json => 1
   end
 
   def top
@@ -116,57 +121,43 @@ class UsersController < ApplicationController
       return data
     end
 
-    def save_fb_data
-      current_user.data = JSON.generate get_fb_data
-      current_user.save
+    def save_fb_page(user, likes)
+      pages = user.fb_pages.build
+      likes.each do |like|
+        pages.pid = like['id']
+        pages.name = like['name']
+      end
+      pages.save
     end
 
-    def get_fb_data
-      data = Hash.new
+    def save_fb_data
       graph = Koala::Facebook::API.new(current_user.token)
-      Koala.config.api_version = "v1.0"
 
       me = graph.get_object('me?fields=birthday,picture')
-      data[:me] = {:image => me['picture']['data']['url']}
-      if !me['birthday'].nil? and me['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/
-        data[:me][:birthday] = {
-          :year   => $3.to_i,
-          :month  => $1.to_i,
-          :day    => $2.to_i
-        }
-      end
-
-      data[:page] = Hash.new
-      graph.get_connections("me", "likes?fields=name,id").each do |like|
-        data[:page][like['id']] = like['name']
-      end
-      data[:me][:likes] = data[:page].keys
+      user = current_user.build_fb_user
+      user.image_url = me['picture']['data']['url']
+      user.birthday = me['birthday']
+      user.save
+      save_fb_page(user, graph.get_connections("me", "likes?fields=name,id"))
 
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
-      data[:friends] = Array.new
       friends.each do |friend|
-        f = {
-          :uid    => friend['id'],
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :gender => friend['gender'],
-          :quotes => friend['quotes'],
-          :image  => friend['picture']['data']['url']
-        }
-
-        f[:likes] = friend['likes']['data'].map { |row| row['id'] } if !friend['likes'].nil?
-
-        if !friend['birthday'].nil? and friend['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/
-          f[:birthday] = {
-            :year   => $3.to_i,
-            :month  => $1.to_i,
-            :day    => $2.to_i
-          }
+        u = User.find_by uid: friend['id']
+        if u.nil?
+          u = User.new(
+            :uid        => friend['id'],
+            :name       => friend['name'],
+            :gender     => friend['gender'],
+            :quotes     => friend['quotes'],
+            :image_url  => friend['picture']['data']['url'],
+            :birthday   => friend['birthday']
+          )
+          save_fb_page(u, friend['likes']['data'])
         end
-
-        data[:friends].push f
+        f = user.fb_friends.build
+        f.fb_friend_id = u.uid
+        f.save
       end
 
-      return data
     end
 end

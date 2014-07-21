@@ -12,11 +12,16 @@ class UsersController < ApplicationController
   end
 
   def test
-    save_fb_data
-    render :json => 1
+    start_time = Time.now
+    get_fb_data
+    end_time = Time.now
+    render :json => (end_time - start_time).to_s + "s"
   end
 
   def top
+
+
+
     @colike = get_colike( fbdata['me']['likes'], fbdata['friends'])
       .values.sort{|a,b| b[:count] <=> a[:count]}
     @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
@@ -87,7 +92,7 @@ class UsersController < ApplicationController
       @fbdata ||= JSON.parse current_user.data
     end
 
-    def get_colike( mylikes, friends)
+    def get_colike(mylikes, friends)
       data = Hash.new
       friends.each do |friend|
         next if friend['likes'].nil?
@@ -121,43 +126,38 @@ class UsersController < ApplicationController
       return data
     end
 
-    def save_fb_page(user, likes)
-      pages = user.fb_pages.build
-      likes.each do |like|
-        pages.pid = like['id']
-        pages.name = like['name']
-      end
-      pages.save
+    def save_user(user, data)
+      user.uid       = data['id']                     || user.uid
+      user.name      = data['name']                   || user.name
+      user.gender    = data['gender']                 || user.gender
+      user.quotes    = data['quotes']                 || user.quotes
+      user.image_url = data['picture']['data']['url'] || user.uid
+      user.birthday  = data['birthday']               || user.birthday
+      user.save
     end
 
-    def save_fb_data
+    def save_pages(user, likes)
+      pages = Array.new
+      likes.each do |like|
+        pages << Page.find_or_create_by(fbid: like['id']){ |page| page.name = like['name'] }
+      end
+      user.pages = pages
+      user.save
+    end
+
+    def get_fb_data
       graph = Koala::Facebook::API.new(current_user.token)
 
-      me = graph.get_object('me?fields=birthday,picture')
-      user = current_user.build_fb_user
-      user.image_url = me['picture']['data']['url']
-      user.birthday = me['birthday']
-      user.save
-      save_fb_page(user, graph.get_connections("me", "likes?fields=name,id"))
+      save_user( current_user, graph.get_object('me?fields=birthday,picture') )
+      save_pages( current_user, graph.get_connections("me", "likes?fields=name,id") )
 
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
       friends.each do |friend|
-        u = User.find_by uid: friend['id']
-        if u.nil?
-          u = User.new(
-            :uid        => friend['id'],
-            :name       => friend['name'],
-            :gender     => friend['gender'],
-            :quotes     => friend['quotes'],
-            :image_url  => friend['picture']['data']['url'],
-            :birthday   => friend['birthday']
-          )
-          save_fb_page(u, friend['likes']['data'])
-        end
-        f = user.fb_friends.build
-        f.fb_friend_id = u.uid
-        f.save
+        user = User.find_or_create_by( uid: friend['id'] )
+        save_user( user, friend )
+        next if friend['likes'].nil?
+        next if friend['likes']['data'].nil?
+        save_pages( user, friend['likes']['data'] )
       end
-
     end
 end

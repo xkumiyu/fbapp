@@ -6,6 +6,11 @@ class CreateUsers < ActiveRecord::Migration
       t.string :name
       t.string :token
 
+      t.string  :image_url
+      t.date    :birthday
+      t.string  :gender
+      t.string  :quotes
+
       t.timestamps
     end
   end

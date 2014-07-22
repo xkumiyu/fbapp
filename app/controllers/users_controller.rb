@@ -20,8 +20,9 @@ class UsersController < ApplicationController
   end
 
   def update
+    redirect_to '/auth/facebook'
     save_fb_data
-    redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
+    # redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end
 
   def gender

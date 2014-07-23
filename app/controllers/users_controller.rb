@@ -11,22 +11,22 @@ class UsersController < ApplicationController
   def about
   end
 
-  def test
-    start_time = Time.now
-    get_fb_data
-    end_time = Time.now
-    render :json => (end_time - start_time).to_s + "s"
-  end
-
   def top
+    @quotes_friends = current_user.friends_user.select{ |row| !row.quotes.nil? }.shuffle.first(10)
 
+    my_likes = current_user.pages.map{|row| row.id}
+    @colike_friends = Array.new
+    current_user.friends_user.each do |friend|
+      friend_likes = friend.pages.map{|row| row.id}
+      ids = my_likes & friend_likes
+      next if ids.size < 1
+      @colike_friends << {
+        :friend => friend,
+        :co_ids => ids,
+      }
+    end
+    @colike_friends = @colike_friends.sort_by{|row| row[:co_ids].size * -1}.first(10)
 
-
-    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'])
-      .values.sort{|a,b| b[:count] <=> a[:count]}
-    @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
-    @myimage = fbdata['me']['image']
-    @pagename = fbdata['page']
   end
 
   def update
@@ -41,8 +41,8 @@ class UsersController < ApplicationController
       { 'gender' => '性別不明', 'population' => 0 }
     ]
 
-    fbdata['friends'].each do |friend|
-      case friend['gender']
+    current_user.friends_user.each do |friend|
+      case friend.gender
       when 'male'
         count[0]['population'] += 1
       when 'female'
@@ -57,20 +57,10 @@ class UsersController < ApplicationController
 
   def age
     age_count = Hash.new(0)
-    fbdata['friends'].each do |friend|
-      next if friend['birthday'].nil?
+    current_user.friends_user.each do |friend|
+      next if friend.birthday.nil?
 
-      birthday = Date.new(
-        friend['birthday']['year'],
-        friend['birthday']['month'],
-        friend['birthday']['day']
-      )
-
-      today = Date.today
-      diff = today - Date.new(today.year, birthday.month, birthday.day)
-      age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
-
-      age_floor = (age / 10.0).floor * 10
+      age_floor = (friend.age / 10.0).floor * 10
       age_count[age_floor] += 1
     end
 
@@ -87,52 +77,15 @@ class UsersController < ApplicationController
       redirect_to '/auth/facebook' if !current_user
     end
 
-    def fbdata
-      save_fb_data if current_user.data.nil?
-      @fbdata ||= JSON.parse current_user.data
-    end
-
-    def get_colike(mylikes, friends)
-      data = Hash.new
-      friends.each do |friend|
-        next if friend['likes'].nil?
-
-        colike_ids = mylikes & friend['likes']
-        next if colike_ids.size == 0
-
-        data[friend['uid']] = {
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :image  => friend['image'],
-          :count  => colike_ids.size,
-          :page   => colike_ids.map{ |id| id}
-        }
-      end
-
-      return data
-    end
-
-    def get_quotes( friends )
-      data = Hash.new
-      friends.each do |friend|
-        next if friend['quotes'].nil?
-        data[friend['uid']] = {
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :image  => friend['image'],
-          :quote  => friend['quotes']
-        }
-      end
-      return data
-    end
-
     def save_user(user, data)
       user.uid       = data['id']                     || user.uid
       user.name      = data['name']                   || user.name
       user.gender    = data['gender']                 || user.gender
       user.quotes    = data['quotes']                 || user.quotes
       user.image_url = data['picture']['data']['url'] || user.uid
-      user.birthday  = data['birthday']               || user.birthday
+      if data['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/ # mm/dd/yyyy
+        user.birthday = Date.new($3.to_i, $1.to_i, $2.to_i)
+      end
       user.save
     end
 
@@ -154,6 +107,8 @@ class UsersController < ApplicationController
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
       friends.each do |friend|
         user = User.find_or_create_by( uid: friend['id'] )
+        Friend.find_or_create_by(user_id: current_user.id, friend_id: user.id)
+
         save_user( user, friend )
         next if friend['likes'].nil?
         next if friend['likes']['data'].nil?

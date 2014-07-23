@@ -31,48 +31,34 @@
             %span.glyphicon.glyphicon-pencil
             友人の好きな言葉
         .panel-body
-          - @quotes.first(10).each do |row|
+          - @quotes_friends.each do |friend|
             .media
               %a.pull-left
-                = image_tag(row[:image], :class => "media-object", :alt => row[:name])
+                = image_tag(friend.image_url, :class => "media-object", :alt => friend.name)
               .media-body
                 %h4.media-heading
-                  = link_to row[:name], row[:link], :target => '_blank'
-                = row[:quote]
-
-          / %ul
-          /   - @quotes.first(10).each do |row|
-          /     %li
-          /       = link_to image_tag(row[:image]), row[:link], :target => '_blank'
-          /       = link_to row[:name], row[:link], :target => '_blank'
-          /       = row[:quote]
+                  = link_to friend.name, friend.url, :target => '_blank'
+                = friend.quotes
 
     .col-md-6.col-sm-12.col-xs-12
       .panel.panel-default
         .panel-heading
           %h4
             %span.glyphicon.glyphicon-thumbs-up
-            趣味が似ている友人？
+              趣味が似ている友人？
         .panel-body
-          - @colike.first(10).each do |row|
+          - @colike_friends.each do |row|
+            - friend = row[:friend]
             .media
               %a.pull-left
-                = image_tag(row[:image], :class => "media-object", :alt => row[:name])
+                = image_tag(friend.image_url, :class => "media-object", :alt => friend.name)
               .media-body
                 %h4.media-heading
-                  = link_to row[:name], row[:link], :target => '_blank'
-                  %span.badge="#{row[:count]}"
-                - row[:page].each do |id|
+                  = link_to friend.name, friend.url, :target => '_blank'
+                  %span.badge= row[:co_ids].size
+                - row[:co_ids].each do |page_id|
+                  - page = Page.find(page_id)
                   %span.label.label-default
-                    = link_to @pagename[id], "https://www.facebook.com/" + id, :target => '_blank'
-
-
-          / %ul
-          /   - @colike.first(10).each do |row|
-          /     %li
-          /       = link_to image_tag(row[:image]), row[:link], :target => '_blank'
-          /       = link_to row[:name], row[:link], :target => '_blank'
-          /       = "#{row[:page]}"
-          /       %span.badge="#{row[:count]}"
+                    = link_to page.name, page.url, :target => '_blank'
 
 = javascript_include_tag 'users'

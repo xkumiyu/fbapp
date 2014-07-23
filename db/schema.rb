@@ -11,17 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140706140527) do
+ActiveRecord::Schema.define(version: 20140721075433) do
 
-  create_table "fb_friends", force: true do |t|
-    t.integer  "fb_user_id"
-    t.integer  "fb_friend_id"
+  create_table "friends", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "friend_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "pages", force: true do |t|
-    t.integer  "fbid"
+    t.string   "fbid"
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"

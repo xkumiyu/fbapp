@@ -22,8 +22,8 @@
         .collapse.navbar-collapse.target
           %ul.nav.navbar-nav.navbar-right
             - if current_user
-              %li= image_tag(@myimage, :class => "media-object", :alt => @myimage, :width => 30)
-              %li= link_to "#{current_user.name}"
+              %li= image_tag(current_user.image_url, :class => "media-object", :alt => current_user.name, :width => 30)
+              %li= link_to current_user.name, current_user.url, :target => '_blank'
             %li= link_to "このアプリについて", "/users/about"
             %li.spin= link_to "データ更新", "/users/update" if current_user
             - if current_user

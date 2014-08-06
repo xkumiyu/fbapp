@@ -26,11 +26,10 @@ class UsersController < ApplicationController
       }
     end
     @colike_friends = @colike_friends.sort_by{|row| row[:co_ids].size * -1}.first(10)
-
   end
 
   def update
-    save_fb_data
+    get_fb_data
     redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end
 
@@ -77,18 +76,6 @@ class UsersController < ApplicationController
       redirect_to '/auth/facebook' if !current_user
     end
 
-    def save_user(user, data)
-      user.uid       = data['id']                     || user.uid
-      user.name      = data['name']                   || user.name
-      user.gender    = data['gender']                 || user.gender
-      user.quotes    = data['quotes']                 || user.quotes
-      user.image_url = data['picture']['data']['url'] || user.uid
-      if data['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/ # mm/dd/yyyy
-        user.birthday = Date.new($3.to_i, $1.to_i, $2.to_i)
-      end
-      user.save
-    end
-
     def save_pages(user, likes)
       pages = Array.new
       likes.each do |like|
@@ -101,15 +88,17 @@ class UsersController < ApplicationController
     def get_fb_data
       graph = Koala::Facebook::API.new(current_user.token)
 
-      save_user( current_user, graph.get_object('me?fields=birthday,picture') )
+      current_user.update_user( graph.get_object('me?fields=birthday,picture') )
+      current_user.save
       save_pages( current_user, graph.get_connections("me", "likes?fields=name,id") )
 
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
       friends.each do |friend|
-        user = User.find_or_create_by( uid: friend['id'] )
+        user = User.find_or_create_by( uid: friend['id'] ) do |user|
+          user.update_user( friend )
+        end
         Friend.find_or_create_by(user_id: current_user.id, friend_id: user.id)
 
-        save_user( user, friend )
         next if friend['likes'].nil?
         next if friend['likes']['data'].nil?
         save_pages( user, friend['likes']['data'] )

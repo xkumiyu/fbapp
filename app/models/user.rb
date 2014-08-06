@@ -20,6 +20,18 @@ class User < ActiveRecord::Base
     end
   end
 
+  def update_user(data)
+    self.uid       = data['id']                     || self.uid
+    self.name      = data['name']                   || self.name
+    self.gender    = data['gender']                 || self.gender
+    self.quotes    = data['quotes']                 || self.quotes
+    self.image_url = data['picture']['data']['url'] || self.image_url
+    if data['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/ # mm/dd/yyyy
+      self.birthday = Date.new($3.to_i, $1.to_i, $2.to_i)
+    end
+    self.provider = 'facebook'
+  end
+
   def friends_user
     User.find( self.friends.map{|row| row.friend_id} )
   end

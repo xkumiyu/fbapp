@@ -33,9 +33,9 @@ ActiveRecord::Schema.define(version: 20140721075433) do
   end
 
   create_table "users", force: true do |t|
-    t.string   "provider"
     t.string   "uid"
     t.string   "name"
+    t.string   "provider"
     t.string   "token"
     t.string   "image_url"
     t.date     "birthday"

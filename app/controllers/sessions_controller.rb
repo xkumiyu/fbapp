@@ -9,8 +9,15 @@ class SessionsController < ApplicationController
     end
 
     session[:user_id] = user.id
-    redirect_to users_url
+
+    if session[:status] == "update"
+      redirect_to '/users/renew'
+      session[:status] = nil
+    else
+      redirect_to users_url
+    end
   end
+
 
   def destroy
     session[:user_id] = nil

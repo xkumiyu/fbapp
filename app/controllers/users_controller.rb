@@ -12,6 +12,12 @@ class UsersController < ApplicationController
   end
 
   def top
+    if session[:status].present?
+      get_fb_data
+      flash[:notice] = 'Facebookからデータを取得しました！' if session[:status] == 'update'
+      session[:status] = nil
+    end
+
     @quotes_friends = current_user.friends_user.select{ |row| !row.quotes.nil? }.shuffle.first(10)
 
     my_likes = current_user.pages.map{|row| row.id}
@@ -31,11 +37,6 @@ class UsersController < ApplicationController
   def update
     session[:status] = "update"
     redirect_to '/auth/facebook'
-  end
-
-  def renew
-    get_fb_data
-    redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end
 
   def gender

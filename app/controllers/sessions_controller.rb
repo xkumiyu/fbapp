@@ -3,7 +3,11 @@ class SessionsController < ApplicationController
   def create
     auth = request.env["omniauth.auth"]
 
-    user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)
+    user = User.find_by_provider_and_uid(auth["provider"], auth["uid"])
+    if user.nil?
+      user = User.create_with_omniauth(auth)
+      session[:status] = 'first'
+    end
     session[:user_id] = user.id
 
     if user.token != auth['credentials']['token']
@@ -11,12 +15,7 @@ class SessionsController < ApplicationController
       user.save
     end
 
-    if session[:status] == "update"
-      session[:status] = nil
-      redirect_to '/users/renew'
-    else
-      redirect_to users_url
-    end
+    redirect_to users_url
   end
 
   def destroy

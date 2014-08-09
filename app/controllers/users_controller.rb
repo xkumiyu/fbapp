@@ -29,6 +29,11 @@ class UsersController < ApplicationController
   end
 
   def update
+    session[:status] = "update"
+    redirect_to '/auth/facebook'
+  end
+
+  def renew
     get_fb_data
     redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end

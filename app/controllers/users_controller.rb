@@ -3,20 +3,29 @@ class UsersController < ApplicationController
   before_action :login, only: [:top, :gender, :age]
 
   def index
-    if current_user
-      redirect_to :action => 'top'
-    end
+    # if current_user
+    #   redirect_to :action => 'top'
+    # end
   end
 
   def about
   end
 
   def top
-    @colike = get_colike( fbdata['me']['likes'], fbdata['friends'])
-      .values.sort{|a,b| b[:count] <=> a[:count]}
-    @quotes = get_quotes( fbdata['friends'] ).values.sort_by{rand}
-    @myimage = fbdata['me']['image']
-    @pagename = fbdata['page']
+    @quotes_friends = current_user.friends_user.select{ |row| !row.quotes.nil? }.shuffle.first(10)
+
+    my_likes = current_user.pages.map{|row| row.id}
+    @colike_friends = Array.new
+    current_user.friends_user.each do |friend|
+      friend_likes = friend.pages.map{|row| row.id}
+      ids = my_likes & friend_likes
+      next if ids.size < 1
+      @colike_friends << {
+        :friend => friend,
+        :co_ids => ids,
+      }
+    end
+    @colike_friends = @colike_friends.sort_by{|row| row[:co_ids].size * -1}.first(10)
   end
 
   def update
@@ -25,7 +34,7 @@ class UsersController < ApplicationController
   end
 
   def renew
-    save_fb_data
+    get_fb_data
     redirect_to '/users', :notice => 'Facebookからデータを取得しました！'
   end
 
@@ -36,8 +45,8 @@ class UsersController < ApplicationController
       { 'gender' => '性別不明', 'population' => 0 }
     ]
 
-    fbdata['friends'].each do |friend|
-      case friend['gender']
+    current_user.friends_user.each do |friend|
+      case friend.gender
       when 'male'
         count[0]['population'] += 1
       when 'female'
@@ -52,20 +61,10 @@ class UsersController < ApplicationController
 
   def age
     age_count = Hash.new(0)
-    fbdata['friends'].each do |friend|
-      next if friend['birthday'].nil?
+    current_user.friends_user.each do |friend|
+      next if friend.birthday.nil?
 
-      birthday = Date.new(
-        friend['birthday']['year'],
-        friend['birthday']['month'],
-        friend['birthday']['day']
-      )
-
-      today = Date.today
-      diff = today - Date.new(today.year, birthday.month, birthday.day)
-      age = diff > 0 ? today.year - birthday.year : today.year - birthday.year - 1
-
-      age_floor = (age / 10.0).floor * 10
+      age_floor = (friend.age / 10.0).floor * 10
       age_count[age_floor] += 1
     end
 
@@ -82,96 +81,32 @@ class UsersController < ApplicationController
       redirect_to '/auth/facebook' if !current_user
     end
 
-    def fbdata
-      save_fb_data if current_user.data.nil?
-      @fbdata ||= JSON.parse current_user.data
-    end
-
-    def get_colike( mylikes, friends)
-      data = Hash.new
-      friends.each do |friend|
-        next if friend['likes'].nil?
-
-        colike_ids = mylikes & friend['likes']
-        next if colike_ids.size == 0
-
-        data[friend['uid']] = {
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :image  => friend['image'],
-          :count  => colike_ids.size,
-          :page   => colike_ids.map{ |id| id}
-        }
+    def save_pages(user, likes)
+      pages = Array.new
+      likes.each do |like|
+        pages << Page.find_or_create_by(fbid: like['id']){ |page| page.name = like['name'] }
       end
-
-      return data
-    end
-
-    def get_quotes( friends )
-      data = Hash.new
-      friends.each do |friend|
-        next if friend['quotes'].nil?
-        data[friend['uid']] = {
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :image  => friend['image'],
-          :quote  => friend['quotes']
-        }
-      end
-      return data
-    end
-
-    def save_fb_data
-      current_user.data = JSON.generate get_fb_data
-      current_user.save
+      user.pages = pages
+      user.save
     end
 
     def get_fb_data
-      data = Hash.new
       graph = Koala::Facebook::API.new(current_user.token)
-      Koala.config.api_version = "v1.0"
 
-      me = graph.get_object('me?fields=birthday,picture')
-      data[:me] = {:image => me['picture']['data']['url']}
-      if !me['birthday'].nil? and me['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/
-        data[:me][:birthday] = {
-          :year   => $3.to_i,
-          :month  => $1.to_i,
-          :day    => $2.to_i
-        }
-      end
-
-      data[:page] = Hash.new
-      graph.get_connections("me", "likes?fields=name,id").each do |like|
-        data[:page][like['id']] = like['name']
-      end
-      data[:me][:likes] = data[:page].keys
+      current_user.update_user( graph.get_object('me?fields=birthday,picture') )
+      current_user.save
+      save_pages( current_user, graph.get_connections("me", "likes?fields=name,id") )
 
       friends = graph.get_connections("me", "friends?fields=id,name,link,birthday,picture,likes,gender,quotes")
-      data[:friends] = Array.new
       friends.each do |friend|
-        f = {
-          :uid    => friend['id'],
-          :name   => friend['name'],
-          :link   => friend['link'],
-          :gender => friend['gender'],
-          :quotes => friend['quotes'],
-          :image  => friend['picture']['data']['url']
-        }
-
-        f[:likes] = friend['likes']['data'].map { |row| row['id'] } if !friend['likes'].nil?
-
-        if !friend['birthday'].nil? and friend['birthday'] =~ /(\d{2})\/(\d{2})\/(\d{4})/
-          f[:birthday] = {
-            :year   => $3.to_i,
-            :month  => $1.to_i,
-            :day    => $2.to_i
-          }
+        user = User.find_or_create_by( uid: friend['id'] ) do |user|
+          user.update_user( friend )
         end
+        Friend.find_or_create_by(user_id: current_user.id, friend_id: user.id)
 
-        data[:friends].push f
+        next if friend['likes'].nil?
+        next if friend['likes']['data'].nil?
+        save_pages( user, friend['likes']['data'] )
       end
-
-      return data
     end
 end
